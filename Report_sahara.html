@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>التقرير  الشامل - معرض صحارى 2026 | C-Level Dashboard</title>
+    
+    <!-- Google Fonts: Tajawal -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Tailwind Custom Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1A365D',
+                        secondary: '#2B6CB0',
+                        accent: '#38A169',
+                        dark: '#1e293b',
+                        light: '#f8fafc',
+                        pageBg: '#f1f5f9'
+                    },
+                    fontFamily: {
+                        sans: ['Tajawal', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #f1f5f9;
+            color: #1e293b;
+            font-family: 'Tajawal', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .dashboard-card {
+            transition: all 0.25s ease-in-out;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 20px -5px rgba(26, 54, 93, 0.08);
+        }
+
+        .card-primary { border-top: 4px solid #1A365D; }
+        .card-secondary { border-top: 4px solid #2B6CB0; }
+        .card-accent { border-top: 4px solid #38A169; }
+
+        .forecast-dashed {
+            border: 2px dashed #2B6CB0;
+            background-color: rgba(43, 108, 176, 0.03);
+        }
+        .actual-solid {
+            border: 1px solid #e2e8f0;
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body class="bg-pageBg text-dark antialiased">
+
+    <!-- Mobile Navigation Toggle Bar -->
+    <div class="lg:hidden bg-primary text-white p-4 flex justify-between items-center sticky top-0 z-50 shadow-md">
+        <span class="font-bold text-lg">معرض صحارى 2026</span>
+        <button id="menuToggle" class="p-2 focus:outline-none bg-white/10 rounded-lg">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
+    </div>
+
+    <div class="flex flex-col lg:flex-row min-h-screen">
+
+        <!-- Sidebar Navigation (Desktop Fixed / Mobile Collapsible) -->
+        <aside id="sidebar" class="w-full lg:w-72 bg-primary text-white flex-shrink-0 lg:block hidden sticky top-0 h-auto lg:h-screen overflow-y-auto z-40 transition-all duration-300 shadow-xl">
+            <div class="p-6 border-b border-white/10">
+                <div class="flex items-center gap-3">
+                    <!-- حاوية اللوجو مع حواف دائرية كاملة وضبط الحجم -->
+                    <div class="w-12 h-12 p-1.5 bg-white/10 backdrop-blur-md rounded-full border border-white/20 flex items-center justify-center shrink-0 shadow-sm">
+                        <img src="logo_1.png" alt="Logo" class="w-full h-full object-contain rounded-full">
+                    </div>
+                    
+                    <div>
+                        <h2 class="font-extrabold text-lg leading-tight text-white">معرض صحارى 2026</h2>
+                        <span class="text-xs text-blue-200 block mt-0.5">Executive Dashboard</span>
+                    </div>
+                </div>            
+            </div>
+            
+            <nav class="p-4 space-y-1 text-sm font-medium">
+                <a href="#summary" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-white/10 text-white/90 hover:text-white transition-colors">
+                    <span>📌</span> الملخص التنفيذي
+                </a>
+                <a href="#kpis" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-white/10 text-white/90 hover:text-white transition-colors">
+                    <span>📊</span> المؤشرات الرئيسية (KPIs)
+                </a>
+                <a href="#acquisition" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-white/10 text-white/90 hover:text-white transition-colors">
+                    <span>📈</span> مصادر الفرص
+                </a>
+                <a href="#conversion" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-white/10 text-white/90 hover:text-white transition-colors">
+                    <span>🔮</span> التنبؤ بالتحويل والمبيعات
+                </a>
+                <a href="#funnel" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-white/10 text-white/90 hover:text-white transition-colors">
+                    <span>🎯</span> Performance Funnel
+                </a>
+                <a href="#products" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-white/10 text-white/90 hover:text-white transition-colors">
+                    <span>📦</span> الطلب على المنتجات
+                </a>
+                <a href="#geography" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-white/10 text-white/90 hover:text-white transition-colors">
+                    <span>🌍</span> التوزيع الجغرافي
+                </a>
+                <a href="#b2b" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-white/10 text-white/90 hover:text-white transition-colors">
+                    <span>🤝</span> الحسابات الكبرى B2B
+                </a>
+                <a href="#competitors" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-white/10 text-white/90 hover:text-white transition-colors">
+                    <span>⚔️</span> استخبارات المنافسين
+                </a>
+                <a href="#closers" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-white/10 text-white/90 hover:text-white transition-colors">
+                    <span>🔥</span> الصفقات ذات الأولوية
+                </a>
+                <a href="#recommendations" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-white/10 text-white/90 hover:text-white transition-colors">
+                    <span>💡</span> التوصيات الاستراتيجية
+                </a>
+                <a href="#action-plan" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-white/10 text-white/90 hover:text-white transition-colors">
+                    <span>🚀</span> خطة التنفيذ التنفيذية
+                </a>
+            </nav>
+
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 p-4 md:p-8 lg:p-10 space-y-10 max-w-7xl mx-auto w-full">
+
+            <!-- 1. Executive Header (Hero) -->
+            <header class="bg-gradient-to-br from-primary via-primary to-secondary text-white rounded-2xl p-6 md:p-10 shadow-2xl relative overflow-hidden">
+                <div class="absolute -left-10 -bottom-10 w-64 h-64 bg-accent/10 rounded-full blur-3xl"></div>
+                <div class="relative z-10 space-y-4">
+                    <div class="inline-flex items-center gap-2 bg-white/10 text-white text-xs md:text-sm font-semibold px-4 py-1.5 rounded-full backdrop-blur-md border border-white/10">
+                        <span>🏛️ C-Level Executive Briefing</span>
+                        <span>•</span>
+                        <span>سبتمبر 2026</span>
+                    </div>
+                    
+                    <h1 class="text-2xl md:text-4xl lg:text-5xl font-black tracking-tight leading-tight">
+                        التقرير الشامل للحملة التسويقية لمعرض صحارى الدولي 2026
+                    </h1>
+                    <h2 class="text-lg md:text-2xl font-medium text-blue-200">
+                         معرض صحارى الدولية — Sahara Exhibition 38
+                    </h2>
+
+                    <div class="pt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs md:text-sm">
+                        <div class="bg-white/10 backdrop-blur-md p-3 rounded-xl border border-white/10 flex items-center gap-3">
+                            <span class="text-xl">🎯</span>
+                            <div>
+                                <span class="text-blue-200 block text-xs">موجّه إلى</span>
+                                <strong class="text-white">الإدارة العليا / مجلس الإدارة</strong>
+                            </div>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md p-3 rounded-xl border border-white/10 flex items-center gap-3">
+                            <span class="text-xl">📊</span>
+                            <div>
+                                <span class="text-blue-200 block text-xs">إعداد</span>
+                                <strong class="text-white">فريق ادارة علاقات العملاء وتحليل البيانات</strong>
+                            </div>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md p-3 rounded-xl border border-white/10 flex items-center gap-3">
+                            <span class="text-xl">📅</span>
+                            <div>
+                                <span class="text-blue-200 block text-xs">الفترة المستهدفة</span>
+                                <strong class="text-white">موسم النمو 2026</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 2. Executive Summary -->
+            <section id="summary" class="space-y-6">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                    <h2 class="text-2xl font-bold text-primary flex items-center gap-2">
+                        <span>📌</span> الملخص التنفيذي | Executive Summary
+                    </h2>
+                    <span class="text-xs font-semibold px-3 py-1 bg-primary/10 text-primary rounded-full">بيانات فعلية مؤكدة</span>
+                </div>
+
+                <!-- Main Highlight Card -->
+                <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-200 border-r-8 border-r-primary space-y-4">
+                    <h3 class="text-xl font-bold text-primary flex items-center gap-2">
+                        <span>🚀</span> النتيجة الرئيسية
+                    </h3>
+                    <p class="text-slate-700 text-base md:text-lg leading-relaxed">
+                        حققت مشاركة الشركة في معرض "صحارى" الزراعي الدولي نتائج استثنائية على صعيد جذب العملاء الاستراتيجيين وتحديد فرص النمو لعام 2026/2027. نجحت الحملة في استقطاب <strong class="text-primary font-black">394 سجلاً (393 كياناً فريداً)</strong> مع تحقيق نسبة قابلية تواصل مرتفعة جداً بلغت <strong class="text-accent font-black">94.2%</strong> ونسبة تكرار شبه معدومة (&lt; 0.3%). كما كشفت المشاركة عن نمو قياسي في الطلب على منتجات شبك التظليل، إلى جانب فرص تصدير استراتيجية وشراكات B2B عالية القيمة.
+                    </p>
+                </div>
+
+                <!-- Acquisition Breakdown Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Entry Leads -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 dashboard-card">
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="text-xs font-bold text-secondary bg-blue-50 px-2.5 py-1 rounded-md">المصدر الميداني</span>
+                            <span class="text-2xl">📝</span>
+                        </div>
+                        <h4 class="text-slate-500 font-bold text-sm">Entry Leads</h4>
+                        <div class="text-3xl font-black text-primary my-1">320 <span class="text-sm font-normal text-slate-500">عميلاً</span></div>
+                        <div class="text-sm font-bold text-secondary mb-3">81.2% من إجمالي الحملة</div>
+                        <p class="text-xs text-slate-600 leading-relaxed border-t border-slate-100 pt-3">
+                            بيانات مسجلة ميدانياً بواسطة فريق المبيعات في جناح المعرض. تمثل التدفق المباشر للزوار وتتضمن 100 عميل عالٍ الاهتمام (31.25%).
+                        </p>
+                    </div>
+
+                    <!-- Cus Leads -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 dashboard-card">
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="text-xs font-bold text-accent bg-emerald-50 px-2.5 py-1 rounded-md">المصدر الرقمي</span>
+                            <span class="text-2xl">📱</span>
+                        </div>
+                        <h4 class="text-slate-500 font-bold text-sm">Cus Leads</h4>
+                        <div class="text-3xl font-black text-primary my-1">63 <span class="text-sm font-normal text-slate-500">عميلاً</span></div>
+                        <div class="text-sm font-bold text-accent mb-3">16.0% من إجمالي الحملة</div>
+                        <p class="text-xs text-slate-600 leading-relaxed border-t border-slate-100 pt-3">
+                            استجابات رقمية عبر QR Code وحملات التواصل الاجتماعي المتزامنة مع فترة المعرض لجمع طلبات الأسعار والعينات.
+                        </p>
+                    </div>
+
+                    <!-- B2B Partners -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 dashboard-card">
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="text-xs font-bold text-primary bg-slate-100 px-2.5 py-1 rounded-md">حسابات كبرى</span>
+                            <span class="text-2xl">🏢</span>
+                        </div>
+                        <h4 class="text-slate-500 font-bold text-sm">B2B Partners</h4>
+                        <div class="text-3xl font-black text-primary my-1">11 <span class="text-sm font-normal text-slate-500">شركة</span></div>
+                        <div class="text-sm font-bold text-primary mb-3">2.8% من إجمالي الحملة</div>
+                        <p class="text-xs text-slate-600 leading-relaxed border-t border-slate-100 pt-3">
+                            شركات زراعية وهندسية كبرى متخصصة في الري والصوب لفرص التوريد الحصري (OEM Supply) والتكامل التجاري.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. Core KPI Dashboard -->
+            <section id="kpis" class="space-y-6">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                    <h2 class="text-2xl font-bold text-primary flex items-center gap-2">
+                        <span>📊</span> لوحة المؤشرات الرئيسية | Core KPI Dashboard
+                    </h2>
+                    <span class="text-xs text-slate-500">مصنفة حسب طبيعة الأثر التجاري</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Volume KPIs (Primary Top Border) -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm card-primary dashboard-card flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-bold text-slate-500 uppercase">Volume KPI</span>
+                                <span class="text-2xl">📥</span>
+                            </div>
+                            <span class="text-sm text-slate-600 font-medium">إجمالي الفرص المستقطبة</span>
+                            <div class="text-3xl font-black text-primary my-2">394 <span class="text-sm font-semibold text-slate-500">سجلاً</span></div>
+                        </div>
+                        <p class="text-xs text-slate-500 border-t border-slate-100 pt-2 mt-2">
+                            اختراق ممتاز للسوق وتدفق عالي من زوار المعرض.
+                        </p>
+                    </div>
+
+
+                    <!-- Commercial KPIs (Accent Top Border) -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm card-accent dashboard-card flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-bold text-accent uppercase">Commercial KPI</span>
+                                <span class="text-2xl">🔥</span>
+                            </div>
+                            <span class="text-sm text-slate-600 font-medium">High-Intent Share</span>
+                            <div class="text-3xl font-black text-accent my-2">31.25%</div>
+                        </div>
+                        <p class="text-xs text-slate-500 border-t border-slate-100 pt-2 mt-2">
+                            100 عميل عالي الجدية من أصل 320 عميل مبيعات ميدانية.
+                        </p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm card-accent dashboard-card flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-bold text-accent uppercase">Commercial KPI</span>
+                                <span class="text-2xl">💰</span>
+                            </div>
+                            <span class="text-sm text-slate-600 font-medium">الشراء الفوري المباشر</span>
+                            <div class="text-3xl font-black text-accent my-2">12 <span class="text-sm font-semibold text-slate-500">عميلاً</span></div>
+                        </div>
+                        <p class="text-xs text-slate-500 border-t border-slate-100 pt-2 mt-2">
+                            فرص جاهزة للإغلاق الفوري وتدفق نقدي خلال 48-72 ساعة.
+                        </p>
+                    </div>
+
+                    <!-- Commercial KPIs Continued -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm card-secondary dashboard-card flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-bold text-secondary uppercase">Commercial KPI</span>
+                                <span class="text-2xl">⭐</span>
+                            </div>
+                            <span class="text-sm text-slate-600 font-medium">عملاء الأولوية الأولى (Priority 1)</span>
+                            <div class="text-3xl font-black text-secondary my-2">76 <span class="text-sm font-semibold text-slate-500">عميلاً</span></div>
+                        </div>
+                        <p class="text-xs text-slate-500 border-t border-slate-100 pt-2 mt-2">
+                            فرص عالية القيمة جاهزة للتواصل والتحويل السريع.
+                        </p>
+                    </div>
+
+                    <!-- Operational KPIs (Secondary Top Border) -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm card-secondary dashboard-card flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-bold text-secondary uppercase">Operational KPI</span>
+                                <span class="text-2xl">📞</span>
+                            </div>
+                            <span class="text-sm text-slate-600 font-medium">Contactability Rate</span>
+                            <div class="text-3xl font-black text-secondary my-2">94.2%</div>
+                        </div>
+                        <p class="text-xs text-slate-500 border-t border-slate-100 pt-2 mt-2">
+                            أرقام هواتف صحيحة ومفعلة وجاهزة للتواصل المباشر.
+                        </p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm card-secondary dashboard-card flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-bold text-secondary uppercase">Operational KPI</span>
+                                <span class="text-2xl">🌐</span>
+                            </div>
+                            <span class="text-sm text-slate-600 font-medium">فرص التصدير الدولية</span>
+                            <div class="text-3xl font-black text-secondary my-2">46 <span class="text-sm font-semibold text-slate-500">عميلاً</span></div>
+                        </div>
+                        <p class="text-xs text-slate-500 border-t border-slate-100 pt-2 mt-2">
+                            يمثلون 12.1% من الإجمالي عبر 5 أسواق إقليمية.
+                        </p>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- 4. Campaign Acquisition Overview -->
+            <section id="acquisition" class="space-y-6">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                    <h2 class="text-2xl font-bold text-primary flex items-center gap-2">
+                        <span>📈</span> مصادر العملاء والفرص | Campaign Acquisition
+                    </h2>
+                    <span class="text-xs bg-slate-200 text-slate-700 font-bold px-2.5 py-1 rounded">توزيع القنوات</span>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                    <!-- Donut Chart -->
+                    <div class="lg:col-span-5 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center justify-center min-h-[340px]">
+                        <h3 class="text-sm font-bold text-slate-600 mb-4 text-center">التوزيع النسبي لمصادر البيانات (394 سجلاً)</h3>
+                        <div class="w-full max-w-[260px]">
+                            <canvas id="acquisitionChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Numerical Insight Cards -->
+                    <div class="lg:col-span-7 space-y-4">
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between hover:border-secondary transition-colors">
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-3 h-3 rounded-full bg-[#1A365D]"></span>
+                                    <h4 class="font-bold text-primary text-base">المبيعات الميدانية (Entry Leads)</h4>
+                                </div>
+                                <p class="text-xs text-slate-500">عملاء تم تسجيل بياناتهم في جناح المعرض مباشرة مع فريق المبيعات.</p>
+                            </div>
+                            <div class="text-left">
+                                <span class="text-2xl font-black text-primary">320</span>
+                                <span class="block text-xs font-bold text-secondary">81.2%</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between hover:border-accent transition-colors">
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-3 h-3 rounded-full bg-[#38A169]"></span>
+                                    <h4 class="font-bold text-primary text-base">الاستجابات الرقمية (Cus Leads)</h4>
+                                </div>
+                                <p class="text-xs text-slate-500">طلب أسعار وعينات عبر نموذج الاستجابة الرقمية وQR المعرض.</p>
+                            </div>
+                            <div class="text-left">
+                                <span class="text-2xl font-black text-primary">63</span>
+                                <span class="block text-xs font-bold text-accent">16.0%</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between hover:border-secondary transition-colors">
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-3 h-3 rounded-full bg-[#2B6CB0]"></span>
+                                    <h4 class="font-bold text-primary text-base">الشراكات الاستراتيجية (B2B Partners)</h4>
+                                </div>
+                                <p class="text-xs text-slate-600">شركات كبرى تعمل في شبكات الري والصوب لفرص التوريد المباشر.</p>
+                            </div>
+                            <div class="text-left">
+                                <span class="text-2xl font-black text-primary">11</span>
+                                <span class="block text-xs font-bold text-primary">2.8%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+<!-- 5. Conversion Forecast -->
+<section id="conversion" class="space-y-6">
+    <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+        <h2 class="text-2xl font-bold text-primary flex items-center gap-2">
+            <span>🔮</span> التنبؤ بالتحويل والمبيعات المقدرة | Conversion Forecast
+        </h2>
+        <span class="text-xs font-bold px-3 py-1 bg-blue-100 text-secondary rounded-full">نموذج التقدير التجاري</span>
+    </div>
+
+    <!-- Executive Summary Benchmark Cards (النسب الكلية والمقارنة بالمعايير) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Expected Conversion Rate -->
+        <div class="bg-gradient-to-br from-slate-900 to-primary text-white p-5 rounded-2xl shadow-md relative overflow-hidden flex flex-col justify-between">
+            <div class="absolute -left-3 -bottom-3 text-white/5 text-7xl font-black select-none">%</div>
+            <div>
+                <span class="text-xs text-blue-200 font-bold tracking-wider block mb-1">معدل التحويل الكلي المتوقع</span>
+                <div class="text-3xl font-black text-emerald-400 my-1">14.7% - 20.8%</div>
+                <p class="text-xs text-slate-300">متوسط متوقع: <strong class="text-white">~17.8%</strong> (58 إلى 82 صفقة مغلقة)</p>
+            </div>
+            <div class="mt-3 pt-2 border-t border-white/10 text-[11px] text-slate-300">
+                بناءً على تجميع كافة فئات الجدية (من أصل 394 عميلاً)
+            </div>
+        </div>
+
+        <!-- Global Campaign Benchmark -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <span class="text-xs text-slate-500 font-bold">معيار المعارض العالمية (B2B Benchmark)</span>
+                    <span class="text-xs px-2 py-0.5 bg-emerald-100 text-emerald-700 font-bold rounded">أداء متفوق 🚀</span>
+                </div>
+                <div class="text-2xl font-black text-slate-700 my-1">10% - 15%</div>
+                <p class="text-xs text-slate-500">متوسط معدل تحويل الحملات الناجحة في المعارض الضخمة</p>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-100 text-[11px] text-slate-600">
+                معدلنا المتوقع (<strong class="text-primary">17.8%</strong>) يتجاوز المتوسط الصناعي لارتفاع جودة المتابعة الميدانية.
+            </div>
+        </div>
+
+        <!-- Expected Conversion Volume -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
+            <div>
+                <span class="text-xs text-slate-500 font-bold block mb-1">حجم الصفقات المتوقع (Total Pipeline)</span>
+                <div class="text-3xl font-black text-secondary my-1">58 - 82 <span class="text-base font-normal text-slate-600">صفقة</span></div>
+                <p class="text-xs text-slate-500">تشمل 10-11 صفقة عاجلة + 3-4 عقود توريد B2B</p>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-100 text-[11px] text-slate-500">
+                من إجمالي <strong class="text-slate-700">394 عميلاً محتملاً</strong> تم استقطابهم بالمعرض
+            </div>
+        </div>
+    </div>
+
+    <!-- Disclaimer Box -->
+    <div class="bg-blue-50 border-r-4 border-secondary p-4 rounded-xl text-sm text-slate-700 flex items-start gap-3 shadow-sm">
+        <span class="text-xl">ℹ️</span>
+        <div>
+            <strong class="font-bold text-secondary block mb-0.5">ملاحظة منهجية وهامة للإدارة:</strong>
+            <p class="text-xs md:text-sm leading-relaxed">
+                جميع أرقام ونسب التحويل المبينة في هذا السيكشن هي <strong class="text-secondary font-bold">توقعات استشرافية (Forecast Models)</strong> مبنية على التحليل الفني لنية الشراء وجدية التواصل الميداني، وليست عقوداً فعلية نهائية أو إيرادات محققة. تهدف هذه النماذج لتحديد الأولويات التشغيلية لفرق المبيعات.
+            </p>
+        </div>
+    </div>
+
+    <!-- Forecast Chart & Table Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-5 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center">
+            <h3 class="text-sm font-bold text-slate-600 mb-4 text-center">معدلات التحويل المتوقعة حسب فئة الجدية (%)</h3>
+            <canvas id="conversionChart" class="max-h-[280px]"></canvas>
+        </div>
+
+        <div class="lg:col-span-7 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 overflow-x-auto">
+            <h3 class="text-sm font-bold text-primary mb-4">جدول التنبؤ بالتحويل والصفقات المتوقعة</h3>
+            <table class="w-full text-right text-xs md:text-sm">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200 text-slate-700">
+                        <th class="p-3 font-bold">فئة الجدية والنية</th>
+                        <th class="p-3 font-bold">العدد</th>
+                        <th class="p-3 font-bold">معدل التحويل المتوقع</th>
+                        <th class="p-3 font-bold">الصفقات المتوقعة</th>
+                        <th class="p-3 font-bold">منطق التقدير</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    <tr class="forecast-dashed">
+                        <td class="p-3 font-bold text-accent">شراء فوري عاجل</td>
+                        <td class="p-3 font-bold">12</td>
+                        <td class="p-3"><span class="bg-emerald-100 text-accent font-bold px-2 py-0.5 rounded">80% - 90%</span></td>
+                        <td class="p-3 font-black text-accent text-base">10 - 11 صفقة</td>
+                        <td class="p-3 text-xs text-slate-500">طلب مباشر ومواصفات محددة جاهزة للتنفيذ</td>
+                    </tr>
+                    <tr>
+                        <td class="p-3 font-bold text-secondary">اهتمام مرتفع</td>
+                        <td class="p-3 font-bold">76</td>
+                        <td class="p-3"><span class="bg-blue-100 text-secondary font-bold px-2 py-0.5 rounded">40% - 50%</span></td>
+                        <td class="p-3 font-bold text-secondary">30 - 38 صفقة</td>
+                        <td class="p-3 text-xs text-slate-500">جاهزية شراء عالية تتطلب متابعة الفنيات</td>
+                    </tr>
+                    <tr>
+                        <td class="p-3 font-bold text-primary">B2B Partnerships</td>
+                        <td class="p-3 font-bold">11</td>
+                        <td class="p-3"><span class="bg-slate-100 text-primary font-bold px-2 py-0.5 rounded">30% - 40%</span></td>
+                        <td class="p-3 font-bold text-primary">3 - 4 صفقات</td>
+                        <td class="p-3 text-xs text-slate-500">عقود توريد وتكامل تجاري متوسطة الأجل</td>
+                    </tr>
+                    <tr>
+                        <td class="p-3 font-bold text-slate-600">اهتمام متوسط / استكشافي</td>
+                        <td class="p-3 font-bold">295</td>
+                        <td class="p-3"><span class="bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded">5% - 10%</span></td>
+                        <td class="p-3 font-bold text-slate-700">15 - 29 صفقة</td>
+                        <td class="p-3 text-xs text-slate-500">تحويل تدريجي عبر حملات Re-targeting</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Source Comparison Horizontal Bars -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+        <h3 class="text-base font-bold text-primary">مقارنة أداء المصادر في التحويل المتوقع</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                <span class="text-xs font-bold text-slate-500 block">Entry Leads (الميداني)</span>
+                <div class="text-xl font-bold text-primary my-1">320 عميلاً</div>
+                <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden my-2">
+                    <div class="bg-primary h-full" style="width: 20%"></div>
+                </div>
+                <span class="text-xs text-slate-600">الصفقات المتوقعة: <strong>40-50 صفقة</strong> (~14%)</span>
+            </div>
+
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                <span class="text-xs font-bold text-slate-500 block">Cus Leads (الرقمي)</span>
+                <div class="text-xl font-bold text-accent my-1">63 عميلاً</div>
+                <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden my-2">
+                    <div class="bg-accent h-full" style="width: 25%"></div>
+                </div>
+                <span class="text-xs text-slate-600">الصفقات المتوقعة: <strong>12-18 صفقة</strong> (~23.8%)</span>
+            </div>
+
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                <span class="text-xs font-bold text-slate-500 block">B2B Partners (الشراكات)</span>
+                <div class="text-xl font-bold text-secondary my-1">11 شركة</div>
+                <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden my-2">
+                    <div class="bg-secondary h-full" style="width: 35%"></div>
+                </div>
+                <span class="text-xs text-slate-600">الصفقات المتوقعة: <strong>3-4 عقود ضخمة</strong> (~31.8%)</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+            <!-- 7. Campaign Funnel -->
+            <section id="funnel" class="space-y-6">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                    <h2 class="text-2xl font-bold text-primary flex items-center gap-2">
+                        <span>🎯</span> Campaign Performance Funnel
+                    </h2>
+                    <span class="text-xs text-slate-500">مسار تصفية وتقييم الجودة</span>
+                </div>
+
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                    <!-- Funnel Stage 1 -->
+                    <div class="relative bg-primary text-white p-4 rounded-xl flex flex-col md:flex-row justify-between items-center gap-4 transition-transform hover:scale-[1.01]">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center font-bold text-sm">1</span>
+                            <div>
+                                <h3 class="font-bold text-base">Gross Acquisitions (إجمالي المسجلين)</h3>
+                                <p class="text-xs text-blue-200">إجمالي النماذج المسجلة من كافة القنوات والمصادر</p>
+                            </div>
+                        </div>
+                        <div class="text-center md:text-left">
+                            <span class="text-2xl font-black">394</span>
+                            <span class="text-xs block text-blue-200">100% من الحملة</span>
+                        </div>
+                    </div>
+
+                    <!-- Funnel Stage 2 -->
+                    <div class="relative bg-accent text-white p-4 rounded-xl flex flex-col md:flex-row justify-between items-center gap-4 w-full md:w-[86%] mx-auto transition-transform hover:scale-[1.01]">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center font-bold text-sm">2</span>
+                            <div>
+                                <h3 class="font-bold text-base">فرص الشراء الفوري</h3>
+                                <p class="text-xs text-emerald-100">عملاء الشراء الفوري والحسابات الكبرى</p>
+                            </div>
+                        </div>
+                        <div class="text-center md:text-left">
+                            <span class="text-2xl font-black">99</span>
+                            <span class="text-xs block text-emerald-100">25.2% من الإجمالي</span>
+                        </div>
+                    </div>
+
+                    <!-- Funnel Stage 3 (Forecast) -->
+                    <div class="relative forecast-dashed p-4 rounded-xl flex flex-col md:flex-row justify-between items-center gap-4 w-full md:w-[75%] mx-auto">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-full bg-secondary text-white flex items-center justify-center font-bold text-sm">3</span>
+                            <div>
+                                <h3 class="font-bold text-base text-secondary">Expected Closed Deals (الصفقات المتوقعة)</h3>
+                                <p class="text-xs text-slate-500">تقديرات الإغلاق المالي بناءً على نموذج التحويل (Forecast)</p>
+                            </div>
+                        </div>
+                        <div class="text-center md:text-left">
+                            <span class="text-2xl font-black text-secondary">58 - 82</span>
+                            <span class="text-xs block text-slate-500 font-bold">صفقة متوقعة</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 8. Product Demand -->
+            <section id="products" class="space-y-6">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                    <h2 class="text-2xl font-bold text-primary flex items-center gap-2">
+                        <span>📦</span> تحليل الطلب على المنتجات | Product Demand
+                    </h2>
+                    <span class="text-xs font-bold px-3 py-1 bg-emerald-100 text-accent rounded-full">استحواذ منتجات التظليل</span>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                    <!-- Hero Product Highlight Card -->
+                    <div class="lg:col-span-4 bg-gradient-to-br from-white to-emerald-50/50 p-6 rounded-2xl shadow-sm border-2 border-accent space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="bg-accent text-white text-xs font-bold px-3 py-1 rounded-full uppercase">Hero Product ⭐</span>
+                            <span class="text-2xl">🌱</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-black text-primary">شبك التظليل (Shading Nets)</h3>
+                            <p class="text-xs text-slate-500 mt-1">المنتج الأكثر طلباً بلا منازع في معرض صحارى</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-emerald-100 text-center">
+                            <span class="text-4xl font-black text-accent block">71.8%</span>
+                            <span class="text-xs font-bold text-slate-600">من إجمالي اهتمامات زوار الحملة</span>
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            يتطلب هذا المنتج توفير مخزون فوري سريع ودراسة هندسية للأسعار لمواجهة المنافسة المباشرة مع شركة الأمير.
+                        </p>
+                    </div>
+
+                    <!-- Horizontal Bar Chart -->
+                    <div class="lg:col-span-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center">
+                        <h3 class="text-sm font-bold text-primary mb-4">توزيع نسب الطلب على المنتجات الرئيسيّة (%)</h3>
+                        <canvas id="productChart" class="max-h-[300px]"></canvas>
+                    </div>
+                </div>
+
+                <!-- Detailed Product Table -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-x-auto">
+                    <div class="p-4 border-b border-slate-100 font-bold text-primary text-sm">
+                        جدول التوزيع التفصيلي للطلب على المنتجات
+                    </div>
+                    <table class="w-full text-right text-xs md:text-sm">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-700">
+                                <th class="p-3 font-bold">اسم المنتج</th>
+                                <th class="p-3 font-bold">طلبات Entry</th>
+                                <th class="p-3 font-bold">طلبات Cus</th>
+                                <th class="p-3 font-bold">النسبة من الحملة</th>
+                                <th class="p-3 font-bold">القطاع المستهدف</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-bold text-primary">شبك التظليل</td>
+                                <td class="p-3 font-bold">230</td>
+                                <td class="p-3 font-bold">53</td>
+                                <td class="p-3 font-black text-accent text-base">71.8%</td>
+                                <td class="p-3 text-xs text-slate-600">المزارع والصوب والمقاولين</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-bold text-primary">شكائر وأكياس تعبئة</td>
+                                <td class="p-3">99</td>
+                                <td class="p-3">23</td>
+                                <td class="p-3 font-bold text-secondary">31.0%</td>
+                                <td class="p-3 text-xs text-slate-600">شركات التعبئة والتصدير</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-bold text-primary">شبك حماية المحاصيل</td>
+                                <td class="p-3">64</td>
+                                <td class="p-3">15</td>
+                                <td class="p-3 font-bold text-slate-700">20.1%</td>
+                                <td class="p-3 text-xs text-slate-600">مزارع الفاكهة والدلتا</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-bold text-primary">شبك تحذير / بيور</td>
+                                <td class="p-3">58</td>
+                                <td class="p-3">13</td>
+                                <td class="p-3 font-bold text-slate-700">18.0%</td>
+                                <td class="p-3 text-xs text-slate-600">المقاولون والبنية التحتية</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-bold text-primary">شبك المناحل</td>
+                                <td class="p-3">37</td>
+                                <td class="p-3">8</td>
+                                <td class="p-3 font-bold text-slate-700">11.4%</td>
+                                <td class="p-3 text-xs text-slate-600">مربو النحل والجمعيات</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 9. Geographic Distribution -->
+            <section id="geography" class="space-y-6">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                    <h2 class="text-2xl font-bold text-primary flex items-center gap-2">
+                        <span>🌍</span> التوزيع الجغرافي للطلب | Geographic Distribution
+                    </h2>
+                    <span class="text-xs font-bold px-3 py-1 bg-blue-100 text-secondary rounded-full">المحاور المحلية والدولية</span>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Geographic Bar Chart -->
+                    <div class="lg:col-span-7 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center">
+                        <h3 class="text-sm font-bold text-primary mb-4">أعلى المحافظات والأسواق الدولية تمثيلاً (%)</h3>
+                        <canvas id="geoChart" class="max-h-[300px]"></canvas>
+                    </div>
+
+                    <!-- Opportunity Clusters -->
+                    <div class="lg:col-span-5 space-y-4">
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border-r-4 border-r-primary space-y-2">
+                            <div class="flex justify-between items-center">
+                                <h4 class="font-bold text-primary text-base">محور المركز والمقرات (القاهرة والجيزة)</h4>
+                                <span class="text-xs font-bold bg-blue-50 text-primary px-2.5 py-1 rounded-md">32.7% من الطلب</span>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                يمثل المركز الرئيسي لمكاتب الشراء والمقاولين والشركات التصديرية الكبرى.
+                            </p>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border-r-4 border-r-accent space-y-2">
+                            <div class="flex justify-between items-center">
+                                <h4 class="font-bold text-primary text-base">فرص التصدير الدولية (International)</h4>
+                                <span class="text-xs font-bold bg-emerald-50 text-accent px-2.5 py-1 rounded-md">46 عميلاً (12.1%)</span>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                طلبات متزايدة من دول (السودان، ليبيا، تونس، الكويت، وعُمان) مع تركيز على الشكائر وشبك التظليل.
+                            </p>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border-r-4 border-r-secondary space-y-2">
+                            <div class="flex justify-between items-center">
+                                <h4 class="font-bold text-primary text-base">المحور الزراعي (الدلتا والمزارع)</h4>
+                                <span class="text-xs font-bold bg-slate-100 text-secondary px-2.5 py-1 rounded-md">17.4% من الطلب</span>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                البحيرة، الغربية، والدقهلية: طلب كثيف على شبك حماية المحاصيل والشبك المضاد للفيروسات.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 10. B2B Strategic Accounts -->
+            <section id="b2b" class="space-y-6">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                    <h2 class="text-2xl font-bold text-primary flex items-center gap-2">
+                        <span>🤝</span> الحسابات الكبرى والشركاء الاستراتيجيون | B2B Accounts
+                    </h2>
+                    <span class="text-xs font-bold px-3 py-1 bg-slate-100 text-primary rounded-full">11 شركة B2B مستهدفة</span>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-x-auto">
+                    <div class="p-4 border-b border-slate-100 font-bold text-primary text-sm flex justify-between items-center">
+                        <span>قائمة الشراكات الاستراتيجية وشركات OEM المعنية</span>
+                        <span class="text-xs font-normal text-slate-500">شركات ري وصوب لا تنتج الشبك والشكائر</span>
+                    </div>
+                    <table class="w-full text-right text-xs md:text-sm">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-700">
+                                <th class="p-3 font-bold">اسم الشركة</th>
+                                <th class="p-3 font-bold">مجال النشاط</th>
+                                <th class="p-3 font-bold">المنتج المطلوب</th>
+                                <th class="p-3 font-bold">تفاصيل الفرصة والتطبيقات</th>
+                                <th class="p-3 font-bold">الإجراء المبيعاتي المطلوب</th>
+                                <th class="p-3 font-bold">الأولوية</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-bold text-primary">دالتكس (Daltex)</td>
+                                <td class="p-3 text-xs">استصلاح ومزارع كبرى</td>
+                                <td class="p-3 font-bold text-accent">شبك نتلون 60% ونت أبيض</td>
+                                <td class="p-3 text-xs text-slate-600">طلبات مباشرة لمزارع الشركة بمنطقة السادات</td>
+                                <td class="p-3 text-xs text-slate-700">اجتماع مباشر مع مدير المشتريات وإرسال العينات</td>
+                                <td class="p-3"><span class="bg-emerald-100 text-accent font-bold px-2 py-0.5 rounded text-xs">عاجل جداً</span></td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-bold text-primary">نايل دريب (Nile Drip)</td>
+                                <td class="p-3 text-xs">شبكات ري وحلول زراعية</td>
+                                <td class="p-3 font-bold text-secondary">شبك زراعي ومناحل</td>
+                                <td class="p-3 text-xs text-slate-600">طلب أسعار وعينات لتضمينها في المشروعات المتكاملة</td>
+                                <td class="p-3 text-xs text-slate-700">جلسة عمل لبحث اتفاقية التوريد الحصري OEM</td>
+                                <td class="p-3"><span class="bg-blue-100 text-secondary font-bold px-2 py-0.5 rounded text-xs">أولوية عالية</span></td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-bold text-primary">خيارات راجح</td>
+                                <td class="p-3 text-xs">مستلزمات زراعية وصوب</td>
+                                <td class="p-3 font-bold text-secondary">شبك تظليل وشكائر</td>
+                                <td class="p-3 text-xs text-slate-600">عقود توزيع وإعادة بيع بأسعار الجملة</td>
+                                <td class="p-3 text-xs text-slate-700">إرسال لائحة أسعار الشركاء وحدود الائتمان</td>
+                                <td class="p-3"><span class="bg-blue-100 text-secondary font-bold px-2 py-0.5 rounded text-xs">أولوية عالية</span></td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-bold text-primary">أوراسكوم سيرفس</td>
+                                <td class="p-3 text-xs">مقاولات ومشروعات ضخمة</td>
+                                <td class="p-3 font-bold font-mono">شبك تحذير وشبك تظليل</td>
+                                <td class="p-3 text-xs text-slate-600">تغطية مشروعات البنية التحتية والميكنة</td>
+                                <td class="p-3 text-xs text-slate-700">تقديم الاعتمادات الفنية للمواصفات الهندسيّة</td>
+                                <td class="p-3"><span class="bg-slate-100 text-primary font-bold px-2 py-0.5 rounded text-xs">متابعة B2B</span></td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-bold text-primary">أفكو ميتال</td>
+                                <td class="p-3 text-xs">أنشطة وتجهيزات الصوب</td>
+                                <td class="p-3 font-bold font-mono">شبك تظليل وحماية</td>
+                                <td class="p-3 text-xs text-slate-600">تجهيز هيكل الصوب الزراعية الموردة للعملاء</td>
+                                <td class="p-3 text-xs text-slate-700">عقد اجتماع للاتفاق على المقاسات الخاصة</td>
+                                <td class="p-3"><span class="bg-slate-100 text-primary font-bold px-2 py-0.5 rounded text-xs">متابعة B2B</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 11. Competitor Intelligence -->
+            <section id="competitors" class="space-y-6">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                    <h2 class="text-2xl font-bold text-primary flex items-center gap-2">
+                        <span>⚔️</span> استخبارات المنافسين | Competitor Intelligence
+                    </h2>
+                    <span class="text-xs font-bold px-3 py-1 bg-red-100 text-red-700 rounded-full">تحليل أسعار السوق</span>
+                </div>
+
+                <div class="bg-slate-900 text-white rounded-2xl p-6 md:p-8 shadow-xl space-y-6">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-800 pb-4 gap-4">
+                        <div>
+                            <span class="text-xs font-bold text-red-400 uppercase tracking-widest block">Main Competitor Intelligence</span>
+                            <h3 class="text-xl font-bold text-white">المنافس الرئيسي المكتشف: شركة الأمير</h3>
+                        </div>
+                    </div>
+
+                    <!-- Competitive Comparison Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-slate-800/60 p-5 rounded-xl border border-slate-700 space-y-3">
+                            <h4 class="font-bold text-red-400 text-sm flex items-center gap-2">
+                                <span>🏷️</span> استخبارات التسعير (Pricing Intelligence)
+                            </h4>
+                            <ul class="text-xs space-y-2 text-slate-300">
+                                <li class="flex justify-between border-b border-slate-700/50 pb-2">
+                                    <span>شبك تظليل 73% (سعر المتر):</span>
+                                    <strong class="text-white font-mono">36 جنيهاً / متر</strong>
+                                </li>
+                                <li class="flex justify-between border-b border-slate-700/50 pb-2">
+                                    <span>شبك تظليل 73% (مع الشريط الخاص):</span>
+                                    <strong class="text-white font-mono">40 جنيهاً / متر</strong>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+
+                    <!-- Strategic Response Block -->
+                    <div class="bg-slate-800 p-4 rounded-xl border-l-4 border-l-accent text-xs text-slate-300 space-y-1">
+                        <strong class="text-accent font-bold block text-sm">التوصية التنافسية :</strong>
+                        <p class="leading-relaxed">
+                            إجراء دراسة هندسية فورية لتكلفة الإنتاج وتحديث المادة التسويقية لتوضيح الفارق الفني (الغرز المزدوجة والمتانة).
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 12. Top Priority Closers -->
+            <section id="closers" class="space-y-6">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                    <h2 class="text-2xl font-bold text-primary flex items-center gap-2">
+                        <span>🔥</span> الصفقات ذات الأولوية | Top Priority Closers
+                    </h2>
+                    <span class="text-xs font-bold px-3 py-1 bg-emerald-100 text-accent rounded-full">12 عميلاً للإغلاق الفوري</span>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-x-auto">
+                    <table class="w-full text-right text-xs md:text-sm">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-700">
+                                <th class="p-3 font-bold">فئة العميل / الكيان</th>
+                                <th class="p-3 font-bold">المنتج المطلوب</th>
+                                <th class="p-3 font-bold">المنطقة الجغرافية</th>
+                                <th class="p-3 font-bold">سبب الأولوية والجدية</th>
+                                <th class="p-3 font-bold">مستوى الأولوية</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <tr class="bg-emerald-50/40">
+                                <td class="p-3 font-bold text-primary">عملاء الشراء الفوري (12 عميلاً)</td>
+                                <td class="p-3 font-bold text-accent">شبك تظليل وشكائر</td>
+                                <td class="p-3 text-xs">القاهرة، البحيرة، والسادات</td>
+                                <td class="p-3 text-xs text-slate-600">جاهزية سداد فورية ومواصفات محددة بالكامل</td>
+                                <td class="p-3"><span class="bg-red-500 text-white font-bold px-2 py-0.5 rounded text-xs">🔴 عاجل جداً</span></td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-primary">شركة دالتكس (Daltex)</td>
+                                <td class="p-3">شبك نتلون 60% ونت أبيض</td>
+                                <td class="p-3 text-xs">السادات / القاهرة</td>
+                                <td class="p-3 text-xs text-slate-600">طلب مباشر لمزارع الشركة واحتياج فوري</td>
+                                <td class="p-3"><span class="bg-red-500 text-white font-bold px-2 py-0.5 rounded text-xs">🔴 عاجل جداً</span></td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-primary">مستوردو التصدير (السودان وليبيا)</td>
+                                <td class="p-3">شكائر تعبئة وشبك تظليل</td>
+                                <td class="p-3 text-xs">أسواق التصدير الإقليمية</td>
+                                <td class="p-3 text-xs text-slate-600">طلب كميات ضخمة وشحن خارجي</td>
+                                <td class="p-3"><span class="bg-amber-500 text-white font-bold px-2 py-0.5 rounded text-xs">🟠 مرتفع</span></td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-primary">شركات المستلزمات الزراعية (19.1%)</td>
+                                <td class="p-3">مختلف أنواع الشبك والشكائر</td>
+                                <td class="p-3 text-xs">الدلتا والصعيد</td>
+                                <td class="p-3 text-xs text-slate-600">رغبة في توقيع عقود توزيع وإعادة بيع</td>
+                                <td class="p-3"><span class="bg-emerald-600 text-white font-bold px-2 py-0.5 rounded text-xs">🟢 متابعة</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 13. Strategic Recommendations -->
+            <section id="recommendations" class="space-y-6">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                    <h2 class="text-2xl font-bold text-primary flex items-center gap-2">
+                        <span>💡</span> التوصيات الاستراتيجية | Strategic Recommendations
+                    </h2>
+                    <span class="text-xs text-slate-500">توجيهات قابلة للتنفيذ المباشر</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-3 dashboard-card">
+                        <div class="flex items-center gap-3">
+                            <span class="p-2 bg-emerald-100 text-accent rounded-xl text-xl">⚡</span>
+                            <div>
+                                <h3 class="font-bold text-primary text-base">Fast Track Execution (المسار السريع)</h3>
+                                <span class="text-xs text-slate-400">الهدف: الإغلاق السريع للسيولة</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            تشكيل فريق مبيعات سريع للتعامل الفوري مع الـ 12 عميلاً الجاهزين للشراء والـ 76 عميلاً في قائمة Priority 1 لضمان عدم تسربهم للمنافسين.
+                        </p>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-3 dashboard-card">
+                        <div class="flex items-center gap-3">
+                            <span class="p-2 bg-blue-100 text-secondary rounded-xl text-xl">🌍</span>
+                            <div>
+                                <h3 class="font-bold text-primary text-base">Export Sales Desk (مكتب للتصدير)</h3>
+                                <span class="text-xs text-slate-400">الهدف: التوسع الإقليمي بالدولار</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            متابعة الـ 46 عميلاً دولياً (السودان، ليبيا، تونس، الكويت، عُمان) وإرسال العينات الفنية والكتالوجات باللغات المناسبة وتسهيل إجراءات الشحن.
+                        </p>
+                    </div>
+
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-3 dashboard-card">
+                        <div class="flex items-center gap-3">
+                            <span class="p-2 bg-slate-100 text-primary rounded-xl text-xl">📲</span>
+                            <div>
+                                <h3 class="font-bold text-primary text-base">Next Exhibition Digital Design</h3>
+                                <span class="text-xs text-slate-400">الهدف: رفع جودة البيانات</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            اعتماد نموذج إدخال رقمي موحد (Digital Lead Form) مزود بـ Dropdowns إجبارية وماسح للبطاقات الشخصية (Business Card Scanner) في المعارض القادمة.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 14. Executive Action Plan -->
+            <section id="action-plan" class="space-y-6">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                    <h2 class="text-2xl font-bold text-primary flex items-center gap-2">
+                        <span>🚀</span> خطة التنفيذ التنفيذية | Executive Action Plan
+                    </h2>
+                </div>
+
+                    <table class="w-full text-right text-xs md:text-sm">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-700">
+                                <th class="p-3 font-bold">الإطار الزمني</th>
+                                <th class="p-3 font-bold">الإجراء الاستراتيجي</th>
+                                <th class="p-3 font-bold">الفئة المستهدفة</th>
+                                <th class="p-3 font-bold">الهدف والمخرجات المتوقعة</th>
+                                <th class="p-3 font-bold">الحالة / الأولوية</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <tr class="bg-emerald-50/50">
+                                <td class="p-3 font-bold text-accent">خلال 48 ساعة</td>
+                                <td class="p-3 font-bold">إغلاق الصفقات الفورية ومتابعة Priority 1</td>
+                                <td class="p-3 text-xs">12 عميل شراء فوري + 76 عميل Priority 1</td>
+                                <td class="p-3 text-xs text-slate-600">تحقيق تدفق نقدي سريع وإغلاق الصفقات قبل المنافسين</td>
+                                <td class="p-3"><span class="bg-accent text-white font-bold px-2.5 py-1 rounded-full text-xs">Immediate</span></td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-secondary">1 - 3 أسابيع</td>
+                                <td class="p-3 font-bold">جلسات عمل B2B وتفعيل التصدير</td>
+                                <td class="p-3 text-xs">شركات (دالتكس، نايل دريب) والأسواق الدولية</td>
+                                <td class="p-3 text-xs text-slate-600">توقيع عقود توريد سنوية ومراسلة عملاء التصدير</td>
+                                <td class="p-3"><span class="bg-secondary text-white font-bold px-2.5 py-1 rounded-full text-xs">24 - 72 Hours</span></td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-primary">المرحلة القادمة</td>
+                                <td class="p-3 font-bold">ربط الـ CRM وأتمتة جمع البيانات</td>
+                                <td class="p-3 text-xs">منظومة بيانات المبيعات الداخلية المعرضية</td>
+                                <td class="p-3 text-xs text-slate-600">إنشاء Pipeline خاص بالمعرض لرفع الجودة لـ &gt; 95%</td>
+                                <td class="p-3"><span class="bg-primary text-white font-bold px-2.5 py-1 rounded-full text-xs">Next Phase</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 15. Executive Insight Strip -->
+            <section class="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4">
+                <div class="bg-white p-4 rounded-xl border border-slate-200 text-center space-y-1">
+                    <span class="text-xs text-slate-400 font-bold block">Market Insight</span>
+                    <strong class="text-primary text-sm block">القاهرة والجيزة والدلتا</strong>
+                    <span class="text-xs text-slate-500">تستحوذ على أكثر من 50% من الطلب المحلي</span>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 text-center space-y-1">
+                    <span class="text-xs text-slate-400 font-bold block">Sales Insight</span>
+                    <strong class="text-accent text-sm block">12 عميل جاهز فوراً</strong>
+                    <span class="text-xs text-slate-500">أعلى فرصة للتحويل النقدي المباشر</span>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 text-center space-y-1">
+                    <span class="text-xs text-slate-400 font-bold block">Product Insight</span>
+                    <strong class="text-secondary text-sm block">شبك التظليل (71.8%)</strong>
+                    <span class="text-xs text-slate-500">المنتج القائد يتطلب تركيز المخزون</span>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 text-center space-y-1">
+                    <span class="text-xs text-slate-400 font-bold block">Strategic Insight</span>
+                    <strong class="text-primary text-sm block">التصدير والشراكات B2B</strong>
+                    <span class="text-xs text-slate-500">الركيزة الأساسية للنمو في 2026/2027</span>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Executive Footer -->
+    <footer class="bg-primary text-white py-8 border-t border-white/10 text-center text-xs md:text-sm">
+        <div class="max-w-7xl mx-auto px-4 space-y-2">
+            <p class="font-bold">Sahara Exhibition — Strategic Marketing Intelligence Report</p>
+            <p class="text-blue-200">Prepared by CRM Team • September 2026</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Charts & Interactivity Script -->
+    <script>
+        // Toggle Sidebar on Mobile
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('hidden');
+        });
+
+        // Global Chart Options for RTL & Tajawal
+        Chart.defaults.font.family = 'Tajawal';
+        Chart.defaults.color = '#1e293b';
+
+        // 1. Acquisition Donut Chart
+        const acqCtx = document.getElementById('acquisitionChart').getContext('2d');
+        new Chart(acqCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Entry Leads (ميداني)', 'Cus Leads (رقمي)', 'B2B Partners (شركاء)'],
+                datasets: [{
+                    data: [320, 63, 11],
+                    backgroundColor: ['#1A365D', '#38A169', '#2B6CB0'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let total = 394;
+                                let value = context.raw;
+                                let percentage = ((value / total) * 100).toFixed(1);
+                                return ` ${context.label}: ${value} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // 2. Conversion Forecast Bar Chart
+        const convCtx = document.getElementById('conversionChart').getContext('2d');
+        new Chart(convCtx, {
+            type: 'bar',
+            data: {
+                labels: ['شراء فوري', 'اهتمام عالي', 'B2B Partners', 'اهتمام متوسط'],
+                datasets: [{
+                    label: 'أعلى معدل تحويل متوقع (%)',
+                    data: [90, 50, 40, 10],
+                    backgroundColor: ['#38A169', '#2B6CB0', '#1A365D', '#94a3b8'],
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true, max: 100, ticks: { callback: value => value + '%' } }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+
+        // 3. Product Demand Horizontal Bar Chart
+const ctx = document.getElementById('productChart').getContext('2d');
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        // ضع أسماء المنتجات هنا بدل الإندكس
+        labels: ['شبك التظليل', 'مواسير الري', 'أنظمة الصوب', 'مستلزمات حفر', 'منتجات أخرى'],
+        datasets: [{
+            label: 'نسبة الطلب (%)',
+            data: [72, 31, 20, 18, 11], // قيم الأعمدة الظاهرة في الرسم
+            backgroundColor: [
+                '#10B981', // أخضر
+                '#2563EB', // أزرق
+                '#1E3A8A', // كحلي
+                '#64748B', // رمادي غامق
+                '#94A3B8'  // رمادي فاتح
+            ],
+            borderRadius: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: false },
+            // إضافة قيم النسب المئوية فوق كل عمود مباشرة لسهولة القراءة
+            tooltip: {
+                callbacks: {
+                    label: (context) => ` ${context.raw}%`
+                }
+            }
+        },
+        scales: {
+            x: {
+                // التأكد من عدم إضافة % على المحور الأفقي
+                ticks: {
+                    font: { family: 'Cairo', weight: 'bold' }
+                }
+            },
+            y: {
+                beginAtZero: true,
+                max: 80,
+                ticks: {
+                    callback: (value) => value + '%' // النسبة تكون في المحور الرأسي فقط
+                }
+            }
+        }
+    }
+});
+        // 4. Geographic Distribution Chart
+        const geoCtx = document.getElementById('geoChart').getContext('2d');
+        new Chart(geoCtx, {
+            type: 'bar',
+            data: {
+                labels: ['القاهرة والجيزة', 'محور الدلتا', 'التصدير الدولي', 'باقي المحافظات'],
+                datasets: [{
+                    label: 'حصة المنطقة من الطلب (%)',
+                    data: [32.7, 17.4, 12.1, 37.8],
+                    backgroundColor: ['#1A365D', '#2B6CB0', '#38A169', '#cbd5e1'],
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true, ticks: { callback: value => value + '%' } }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
